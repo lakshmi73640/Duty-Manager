@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Daily Duty Manager</title>
+  <link rel="manifest" href="/manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary-color: #f1f5f9;
+      --accent-color: #10b981;
+      --danger-color: #ef4444;
+      --warning-color: #f59e0b;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-light: #94a3b8;
+      --background: #ffffff;
+      --surface: #f8fafc;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .header h1 i {
+      font-size: 2.5rem;
+      color: #fbbf24;
+    }
+
+    .header p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    /* Clock Container */
+    .clock-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .clock {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .clock i {
+      color: var(--primary-color);
+    }
+
+    /* Card Layout */
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(99, 102, 241, 0.1);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title i {
+      color: var(--primary-color);
+    }
+
+    /* Input Group */
+    .input-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group.single-column {
+      grid-template-columns: 1fr;
+    }
+
+    /* Form Controls */
+    input, select, button {
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    input[type="date"], input[type="month"] {
+      cursor: pointer;
+    }
+
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+      appearance: none;
+    }
+
+    /* Buttons */
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--text-primary);
+    }
+
+    .btn-success {
+      background: var(--accent-color);
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-danger {
+      background: var(--danger-color);
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-warning {
+      background: var(--warning-color);
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+    }
+
+    /* Stats Section */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.2s ease;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-box div:first-child {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .stat-box div:last-child {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th {
+      background: var(--surface);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:hover {
+      background: var(--surface);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-icon {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      border-radius: var(--radius-sm);
+      min-width: auto;
+    }
+
+    .btn-edit {
+      background: var(--warning-color);
+    }
+
+    .btn-edit:hover {
+      background: #d97706;
+    }
+
+    .btn-delete {
+      background: var(--danger-color);
+    }
+
+    .btn-delete:hover {
+      background: #dc2626;
+    }
+
+    /* OT Hours Container */
+    .ot-hours-container {
+      display: none;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: var(--surface);
+      color: var(--text-primary);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text-primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      background: var(--accent-color);
+    }
+
+    .toast.error {
+      background: var(--danger-color);
+    }
+
+    .toast.warning {
+      background: var(--warning-color);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      color: white;
+      border-radius: var(--radius-lg);
+      margin-top: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .clock-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .input-group {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn-icon {
+        width: 100%;
+      }
+
+      .toast {
+        right: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 1rem;
+      }
+
+      .clock-container {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .clock {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Smooth transitions for all interactive elements */
+    * {
+      transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Focus styles for accessibility */
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1><i class="fas fa-calendar-check"></i> Duty Manager Pro</h1>
+      <p>Manage your daily duties with style and efficiency</p>
+    </div>
+
+    <!-- Clock Section -->
+    <div class="clock-container">
+      <div class="clock" id="clock">
+        <i class="fas fa-clock"></i>
+        <span>Loading...</span>
+      </div>
+      <button class="btn-danger" onclick="confirmClearData()">
+        <i class="fas fa-trash-alt"></i>
+        Clear All Data
+      </button>
+    </div>
+
+    <!-- Input Section -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-plus-circle"></i>
+        Add New Duty
+      </div>
+      
+      <div class="input-group">
+        <input type="date" id="dutyDate" placeholder="Select Date">
+        
+        <select id="supervisor">
+          <option value="">Select Supervisor</option>
+          <option value="Najibul">Najibul</option>
+          <option value="Ashok">Ashok</option>
+          <option value="Mujibur">Mujibur</option>
+        </select>
+
+        <select id="dutyShift" onchange="toggleOtHours()">
+          <option value="">Select Shift Type</option>
+          <option value="Morning">Morning (6 AM - 2 PM)</option>
+          <option value="General">General (10 AM - 6 PM)</option>
+          <option value="Day">Day (2 PM - 10 PM)</option>
+          <option value="Night">Night (10 PM - 6 AM)</option>
+          <option value="Morning-ot">Morning OT (6 AM - 2 PM)</option>
+          <option value="Day-ot">Day OT (2 PM - 10 PM)</option>
+          <option value="Night-ot">Night OT (10 PM - 6 AM)</option>
+        </select>
+
+        <select id="otHours" class="ot-hours-container">
+          <option value="0">Select OT Hours</option>
+          <option value="1">1 Hour OT</option>
+          <option value="2">2 Hours OT</option>
+          <option value="3">3 Hours OT</option>
+          <option value="4">4 Hours OT</option>
+          <option value="5">5 Hours OT</option>
+          <option value="6">6 Hours OT</option>
+          <option value="7">7 Hours OT</option>
+        </select>
+      </div>
+
+      <div class="input-group single-column">
+        <button class="btn-success" onclick="handleDuty()">
+          <i class="fas fa-plus"></i>
+          Add Duty
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats">
+      <div class="stat-box">
+        <div><i class="fas fa-list"></i> Total Duties</div>
+        <div id="totalDuties">0</div>
+      </div>
+      <div class="stat-box">
+        <div><i class="fas fa-calendar-alt"></i> This Month</div>
+        <div id="monthDuties">0</div>
+      </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-table"></i>
+        Duty Records
+      </div>
+      
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th><i class="fas fa-calendar"></i> Date</th>
+              <th><i class="fas fa-user-tie"></i> Supervisor</th>
+              <th><i class="fas fa-clock"></i> Shift</th>
+              <th><i class="fas fa-cogs"></i> Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dutyList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-download"></i>
+        Export & Import
+      </div>
+      
+      <div class="input-group">
+        <input type="month" id="exportMonth" placeholder="Select Month">
+        <button class="btn-warning" onclick="exportToPDF()">
+          <i class="fas fa-file-pdf"></i>
+          Export PDF
+        </button>
+        <button class="btn-secondary" onclick="exportData()">
+          <i class="fas fa-download"></i>
+          Export JSON
+        </button>
+        <button onclick="showImport()">
+          <i class="fas fa-upload"></i>
+          Import JSON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal" id="importModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-upload"></i>
+          Import Data
+        </div>
+        <button class="close-btn" onclick="hideImport()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+          Select a JSON file to import duty data. This will replace all existing data.
+        </p>
+        <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem; width: 100%;">
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button class="btn-secondary" onclick="hideImport()">Cancel</button>
+          <button class="btn-success" onclick="importData()">
+            <i class="fas fa-check"></i>
+            Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          Confirm Action
+        </div>
+        <button class="close-btn" onclick="hideConfirm()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div>
+        <p id="confirmMessage" style="margin-bottom: 1.5rem; color: var(--text-secondary);"></p>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button class="btn-secondary" onclick="hideConfirm()">Cancel</button>
+          <button class="btn-danger" id="confirmButton">
+            <i class="fas fa-check"></i>
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <i class="fas fa-info-circle"></i>
+    <span></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+
+    let editingId = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("dutyDate").value = new Date().toISOString().split("T")[0];
+      refreshDuties();
+      startClock();
+    });
+
+    function startClock() {
+      const clockElement = document.getElementById("clock");
+      function updateClock() {
+        const now = new Date();
+        const date = now.toLocaleDateString(undefined, { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        const time = now.toLocaleTimeString();
+        clockElement.innerHTML = `<i class="fas fa-clock"></i><span>${time} - ${date}</span>`;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+    }
+
+    function toggleOtHours() {
+      const shiftSelect = document.getElementById("dutyShift");
+      const otHoursContainer = document.getElementById("otHours");
+      
+      if (shiftSelect.value.includes("-ot")) {
+        otHoursContainer.style.display = "block";
+        otHoursContainer.classList.add("show");
+      } else {
+        otHoursContainer.style.display = "none";
+        otHoursContainer.classList.remove("show");
+        otHoursContainer.value = "0";
+      }
+    }
+
+    function handleDuty() {
+      const date = document.getElementById("dutyDate").value;
+      const shift = document.getElementById("dutyShift").value;
+      const supervisor = document.getElementById("supervisor").value;
+      const otHours = document.getElementById("otHours").value;
+
+      if (!date) {
+        showToast("Please select a date", "error");
+        return;
+      }
+
+      if (!shift) {
+        showToast("Please select a shift", "error");
+        return;
+      }
+
+      if (!supervisor) {
+        showToast("Please select supervisor", "error");
+        return;
+      }
+
+      if (shift.includes("-ot") && otHours === "0") {
+        showToast("Please select OT hours for OT shifts", "error");
+        return;
+      }
+
+      const duties = JSON.parse(localStorage.getItem("duties")) || [];
+      
+      // Check for duplicates (excluding current editing item)
+      const isDuplicate = duties.some(d => 
+        d.date === date && 
+        d.shift === shift && 
+        d.id !== editingId
+      );
+
+      if (isDuplicate) {
+        showToast("Duplicate entry: Same date and shift already exists.", "error");
+        return;
+      }
+
+      const duty = {
+        id: editingId || Date.now(),
+        date,
+        shift,
+        supervisor,
+        otHours: shift.includes("-ot") ? parseInt(otHours) : 0
+      };
+
+      if (editingId !== null) {
+        const index = duties.findIndex(d => d.id === editingId);
+        if (index > -1) {
+          duties[index] = duty;
+          localStorage.setItem("duties", JSON.stringify(duties));
+          editingId = null;
+          showToast("Duty updated successfully!", "success");
+          resetForm();
+        }
+      } else {
+        duties.push(duty);
+        localStorage.setItem("duties", JSON.stringify(duties));
+        showToast("Duty added successfully!", "success");
+        resetForm();
+      }
+
+      refreshDuties();
+    }
+
+    function resetForm() {
+      document.getElementById("dutyDate").value = new Date().toISOString().split("T")[0];
+      document.getElementById("dutyShift").value = "";
+      document.getElementById("supervisor").value = "";
+      document.getElementById("otHours").value = "0";
+      toggleOtHours();
+      editingId = null;
+      
+      // Update button text
+      const addButton = document.querySelector('button[onclick="handleDuty()"]');
+      addButton.innerHTML = '<i class="fas fa-plus"></i> Add Duty';
+      addButton.className = 'btn-success';
+    }
+
+    function refreshDuties() {
+      const duties = JSON.parse(localStorage.getItem("duties")) || [];
+      const dutyList = document.getElementById("dutyList");
+      dutyList.innerHTML = "";
+
+      // Sort duties by date (newest first)
+      duties.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      duties.forEach(duty => {
+        const row = document.createElement("tr");
+        let shiftDisplay = duty.shift.replace("-ot", " OT");
+        if (duty.otHours > 0) {
+          shiftDisplay += ` (${duty.otHours} hour${duty.otHours > 1 ? 's' : ''})`;
+        }
+
+        const formattedDate = new Date(duty.date).toLocaleDateString('en-US', {
+          weekday: 'short',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+
+        row.innerHTML = `
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fas fa-calendar-day" style="color: var(--primary-color);"></i>
+              ${formattedDate}
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fas fa-user" style="color: var(--accent-color);"></i>
+              ${duty.supervisor || '—'}
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fas fa-clock" style="color: var(--warning-color);"></i>
+              ${shiftDisplay}
+            </div>
+          </td>
+          <td>
+            <div class="actions">
+              <button class="btn-icon btn-edit" onclick="editDuty(${duty.id})">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-icon btn-delete" onclick="deleteDuty(${duty.id})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </td>
+        `;
+        dutyList.appendChild(row);
+      });
+
+      // Update stats
+      document.getElementById("totalDuties").textContent = duties.length;
+      const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+      const currentYear = new Date().getFullYear();
+      const monthDuties = duties.filter(d => {
+        const dutyDate = new Date(d.date);
+        return dutyDate.toLocaleString('default', { month: 'long' }) === currentMonth &&
+               dutyDate.getFullYear() === currentYear;
+      }).length;
+      document.getElementById("monthDuties").textContent = monthDuties;
+
+      // Show empty state if no duties
+      if (duties.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-light);">
+            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+            No duties recorded yet. Add your first duty above!
+          </td>
+        `;
+        dutyList.appendChild(row);
+      }
+    }
+
+    function editDuty(id) {
+      const duties = JSON.parse(localStorage.getItem("duties")) || [];
+      const duty = duties.find(d => d.id === id);
+      if (duty) {
+        editingId = id;
+        document.getElementById("dutyDate").value = duty.date;
+        document.getElementById("dutyShift").value = duty.shift;
+        document.getElementById("supervisor").value = duty.supervisor;
+        document.getElementById("otHours").value = duty.otHours;
+        toggleOtHours();
+        
+        // Update button text and style
+        const addButton = document.querySelector('button[onclick="handleDuty()"]');
+        addButton.innerHTML = '<i class="fas fa-save"></i> Update Duty';
+        addButton.className = 'btn-warning';
+        
+        // Scroll to form
+        document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        
+        showToast("Editing duty record", "warning");
+      }
+    }
+
+    function deleteDuty(id) {
+      showConfirm("Are you sure you want to delete this duty record? This action cannot be undone.", () => {
+        const duties = JSON.parse(localStorage.getItem("duties")) || [];
+        const updatedDuties = duties.filter(d => d.id !== id);
+        localStorage.setItem("duties", JSON.stringify(updatedDuties));
+        refreshDuties();
+        showToast("Duty deleted successfully!", "success");
+      });
+    }
+
+    function showToast(message, type = "info") {
+      const toast = document.getElementById("toast");
+      const iconMap = {
+        success: "fas fa-check-circle",
+        error: "fas fa-exclamation-circle",
+        warning: "fas fa-exclamation-triangle",
+        info: "fas fa-info-circle"
+      };
+      
+      toast.innerHTML = `<i class="${iconMap[type]}"></i><span>${message}</span>`;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 4000);
+    }
+
+    function showConfirm(message, callback) {
+      const modal = document.getElementById("confirmModal");
+      const messageEl = document.getElementById("confirmMessage");
+      const confirmBtn = document.getElementById("confirmButton");
+      
+      messageEl.textContent = message;
+      modal.classList.add("show");
+      
+      confirmBtn.onclick = () => {
+        callback();
+        hideConfirm();
+      };
+    }
+
+    function hideConfirm() {
+      document.getElementById("confirmModal").classList.remove("show");
+    }
+
+    function confirmClearData() {
+      showConfirm("Are you sure you want to clear all duty data? This action cannot be undone.", clearAllData);
+    }
+
+    function clearAllData() {
+      localStorage.removeItem("duties");
+      refreshDuties();
+      resetForm();
+      showToast("All data cleared successfully!", "success");
+    }
+
+    function showImport() {
+      document.getElementById("importModal").classList.add("show");
+    }
+
+    function hideImport() {
+      document.getElementById("importModal").classList.remove("show");
+      document.getElementById("importFile").value = "";
+    }
+
+    function importData() {
+      const fileInput = document.getElementById("importFile");
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        showToast("Please select a file to import", "error");
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data)) {
+            localStorage.setItem("duties", JSON.stringify(data));
+            refreshDuties();
+            hideImport();
+            showToast("Data imported successfully!", "success");
+          } else {
+            showToast("Invalid file format. Please select a valid JSON file.", "error");
+          }
+        } catch (error) {
+          showToast("Error reading file. Please check the file format.", "error");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportData() {
+      const duties = JSON.parse(localStorage.getItem("duties")) || [];
+      const dataStr = JSON.stringify(duties, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(dataBlob);
+      link.download = `duty_data_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      
+      showToast("Data exported successfully!", "success");
+    }
+
+    function exportToPDF() {
+      const exportMonth = document.getElementById("exportMonth").value;
+      if (!exportMonth) {
+        showToast("Please select a month to export", "error");
+        return;
+      }
+      
+      const duties = JSON.parse(localStorage.getItem("duties")) || [];
+      const [year, month] = exportMonth.split('-');
+      const filteredDuties = duties.filter(d => {
+        const dutyDate = new Date(d.date);
+        return dutyDate.getFullYear() == year && (dutyDate.getMonth() + 1) == month;
+      });
+      
+      if (filteredDuties.length === 0) {
+        showToast("No duties found for the selected month", "warning");
+        return;
+      }
+      
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(20);
+      doc.text('Duty Report', 20, 20);
+      
+      // Add month/year
+      const monthName = new Date(year, month - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+      doc.setFontSize(14);
+      doc.text(`Month: ${monthName}`, 20, 35);
+      
+      // Prepare table data
+      const tableData = filteredDuties.map(duty => [
+        new Date(duty.date).toLocaleDateString(),
+        duty.supervisor,
+        duty.shift.replace("-ot", " OT") + (duty.otHours > 0 ? ` (${duty.otHours}h)` : '')
+      ]);
+      
+      // Add table
+      doc.autoTable({
+        head: [['Date', 'Supervisor', 'Shift']],
+        body: tableData,
+        startY: 45,
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [99, 102, 241] }
+      });
+      
+      // Save PDF
+      doc.save(`duty_report_${exportMonth}.pdf`);
+      showToast("PDF exported successfully!", "success");
+    }
+
+    // Close modals when clicking outside
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('show');
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal.show').forEach(modal => {
+          modal.classList.remove('show');
+        });
+      }
+    });
+  </script>
+
+  <footer>
+    <p>&copy; 2025 Chandan Ruidas. All rights reserved. | Built with ❤️ and modern web technologies</p>
+  </footer>
+</body>
+</html>
+
